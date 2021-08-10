@@ -16,6 +16,10 @@ const full = new Full({
   el: document.querySelector('#full'),
   // 切换按钮
   toggle: document.querySelector('#toggle'),
+  // 强制旋转
+  forceRotate: false,
+  // 自动旋转
+  autoRotate: false
 });
 ```
 
@@ -28,3 +32,4 @@ const full = new Full({
 | el          | 全屏容器 | `HTMLElement` or `Selector` | null   |
 | toggle      | 切换按钮 | `HTMLElement` or `Selector` | null   |
 | forceRotate | 强制旋转 | `boolean`                   | false  |
+| autoRotate | 自动旋转 | `boolean`                   | false  |

@@ -22,6 +22,11 @@
     style.appendChild(document.createTextNode(".__is_full__{touch-action: none}"));
     var head = document.getElementsByTagName("head")[0];
     head.appendChild(style);
+
+    this.autoRotate = config.autoRotate
+    if(this.autoRotate) {
+      this.bindOriginChange()
+    }
   }
 
   Full.prototype.getEl = function (el) {
@@ -116,16 +121,20 @@
     var body = document.body
 
     var update = function () {
-      if (body.classList.contains('__is_full__')) {
+      if (body.classList.contains('__is_full__') || that.autoRotate) {
         if (Math.abs(window.orientation) === 90) {
           that.getStyle(3)
         } else {
-          that.getStyle(that.forceRotate ? 1 : 3)
+          if (!body.classList.contains('__is_full__')) {
+            that.getStyle(2)
+          } else {
+            that.getStyle(that.forceRotate ? 1 : 3)
+          }
         }
       } else {
         that.getStyle(2)
       }
-      if (that.__is_full__) {
+      if (that.__is_full__ || that.autoRotate) {
         window.requestAnimationFrame(update)
       }
     }
