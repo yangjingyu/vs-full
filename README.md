@@ -18,3 +18,13 @@ const full = new Full({
   toggle: document.querySelector('#toggle'),
 });
 ```
+
+## 参数
+
+- Selector 为 querySelector 选择器 如：'#ID' '.CLASS'
+
+| 参数名      | 描述     | 可选值                      | 默认值 |
+| ----------- | -------- | --------------------------- | ------ |
+| el          | 全屏容器 | `HTMLElement` or `Selector` | null   |
+| toggle      | 切换按钮 | `HTMLElement` or `Selector` | null   |
+| forceRotate | 强制旋转 | `boolean`                   | false  |

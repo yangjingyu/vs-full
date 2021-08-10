@@ -1,7 +1,14 @@
 ; (function () {
   function Full(config) {
     this.el = this.getEl(config.el)
+    if (!(this.el instanceof HTMLElement)) {
+      throw 'el must be Element or Selector!'
+    }
     this.toggle = this.getEl(config.toggle)
+    if (!(this.toggle instanceof HTMLElement)) {
+      throw 'toggle must be Element or Selector!'
+    }
+    this.forceRotate = config.forceRotate || false
     this.blank = this.insertBlank()
     this.bindToggle()
     this._style = this.el.getAttribute('style')
@@ -59,7 +66,7 @@
       var body = document.body
       if (!body.classList.contains('__is_full__')) {
         body.classList.add('__is_full__')
-        that.getStyle(1)
+        that.getStyle(that.forceRotate ? 1 : 3)
         that.__is_full__ = true
         that.bindOriginChange()
       } else {
@@ -113,7 +120,7 @@
         if (Math.abs(window.orientation) === 90) {
           that.getStyle(3)
         } else {
-          that.getStyle(1)
+          that.getStyle(that.forceRotate ? 1 : 3)
         }
       } else {
         that.getStyle(2)
