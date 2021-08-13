@@ -17,6 +17,7 @@
     </div>
     <button id="toggle">{}</button>
   </div>
+  <div class="start">start</div>
   <script src="./index.js"></script>
   <script>
     const full = new Full({
@@ -25,9 +26,11 @@
       // 切换按钮
       toggle: document.querySelector('#toggle'),
       // 强制旋转
-      forceRotate: false,
+      forceRotate: true,
       // 自动旋转
-      autoRotate: false
+      autoRotate: false,
+      // 禁止滑动
+      disableScroll: true
     })
   </script>
 </body>

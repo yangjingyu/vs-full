@@ -9,6 +9,7 @@
       throw 'toggle must be Element or Selector!'
     }
     this.forceRotate = config.forceRotate || false
+    this.disableScroll = config.disableScroll || false
     this.blank = this.insertBlank()
     this.bindToggle()
     this._style = this.el.getAttribute('style')
@@ -19,13 +20,17 @@
     }
 
     var style = document.createElement("style");
-    style.appendChild(document.createTextNode(".__is_full__{touch-action: none}"));
+    style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
     var head = document.getElementsByTagName("head")[0];
     head.appendChild(style);
 
     this.autoRotate = config.autoRotate
-    if(this.autoRotate) {
+    if (this.autoRotate) {
       this.bindOriginChange()
+    }
+
+    if (this.disableScroll) {
+      this.touchmove()
     }
   }
 
@@ -139,6 +144,15 @@
       }
     }
     window.requestAnimationFrame(update)
+  }
+
+  Full.prototype.touchmove = function () {
+    var body = document.body
+    this.el.addEventListener('touchmove', function (event) {
+      if (body.classList.contains('__is_full__')) {
+        event.preventDefault();
+      }
+    }, { passive: false })
   }
 
   window.Full = Full
