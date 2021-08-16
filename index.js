@@ -32,6 +32,8 @@
     if (this.disableScroll) {
       this.touchmove()
     }
+
+    this.onUpdate = function() {}
   }
 
   Full.prototype.getEl = function (el) {
@@ -124,7 +126,7 @@
   Full.prototype.bindOriginChange = function () {
     var that = this
     var body = document.body
-
+    var w = this.css.w
     var update = function () {
       if (body.classList.contains('__is_full__') || that.autoRotate) {
         if (Math.abs(window.orientation) === 90) {
@@ -141,6 +143,15 @@
       }
       if (that.__is_full__ || that.autoRotate) {
         window.requestAnimationFrame(update)
+      }
+
+      if (that.el.offsetWidth !== w) {
+        w = that.el.offsetWidth
+        that.onUpdate && that.onUpdate({
+          w: w,
+          h: that.el.offsetHeight,
+          or: window.orientation
+        })
       }
     }
     window.requestAnimationFrame(update)

@@ -36,3 +36,9 @@ const full = new Full({
 | forceRotate   | 强制旋转 | `boolean`                   | false  |
 | autoRotate    | 自动旋转 | `boolean`                   | false  |
 | disableScroll | 禁止滑动 | `boolean`                   | false  |
+
+## 事件
+
+| 事件名   | 描述           |
+| -------- | -------------- |
+| onUpdate | 宽高变化时触发 |
