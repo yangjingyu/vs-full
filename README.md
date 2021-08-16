@@ -11,6 +11,8 @@
 ```
 
 ```js
+import Full from 'vs-full'
+
 const full = new Full({
   // 需要全屏的容器
   el: document.querySelector('#full'),
