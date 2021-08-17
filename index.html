@@ -15,6 +15,7 @@
       <div class="start">start</div>
       <div>end</div>
     </div>
+    <button id="lock">lock</button>
     <button id="toggle">{}</button>
   </div>
   <button id="destory">destory</button>
@@ -31,15 +32,20 @@
       // 自动旋转
       autoRotate: false,
       // 禁止滑动
-      disableScroll: true
+      disableScroll: false
     })
 
     full.onUpdate = (data) => {
       console.log(data);
     }
 
+
     document.getElementById('destory').onclick = function () {
       full.destory()
+    }
+
+    document.getElementById('lock').onclick = function () {
+      full.lock(true)
     }
   </script>
 </body>

@@ -20,9 +20,10 @@ function Full(config) {
 
   this.type = -1
   this.isDestory = false
+  this.cancelFrame = null
 
   var style = document.createElement("style");
-  style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
+  style.appendChild(document.createTextNode(".__is_lock__{touch-action: none; overflow: hidden;}"));
   var head = document.getElementsByTagName("head")[0];
   head.appendChild(style);
 
@@ -108,6 +109,8 @@ Full.prototype.getStyle = function (boo) {
         'height:' + offset.w + 'px',
         'position: fixed',
         'z-index: 99999',
+        'top: 0',
+        'left: 0',
         'transform:rotate(90deg) translate(' + trans + 'px, ' + trans + 'px)'
       ].join(';')
       break
@@ -124,6 +127,8 @@ Full.prototype.getStyle = function (boo) {
       that.el.style = this._style + [
         'width:' + offset.ww + 'px',
         'height:' + offset.wh + 'px',
+        'top: 0',
+        'left: 0',
         'position: fixed',
         'z-index: 99999',
       ].join(';')
@@ -135,6 +140,9 @@ Full.prototype.bindOriginChange = function () {
   var that = this
   var body = document.body
   var w = this.css.w
+  that.cancelFrameFn()
+  var willChange = null
+  var needUpdate = true
   var update = function () {
     if (body.classList.contains('__is_full__') || that.autoRotate) {
       if (Math.abs(window.orientation) === 90) {
@@ -149,27 +157,38 @@ Full.prototype.bindOriginChange = function () {
     } else {
       that.getStyle(2)
     }
-    if ((that.__is_full__ || that.autoRotate) && !that.isDestory) {
-      window.requestAnimationFrame(update)
+
+    if ((that.__is_full__ || that.autoRotate || needUpdate) && !that.isDestory) {
+      if (window.requestAnimationFrame) {
+        that.cancelFrame = window.requestAnimationFrame(update)
+      } else {
+        that.cancelFrame = setTimeout(update, 100)
+      }
     }
 
     if (that.el.offsetWidth !== w) {
-      w = that.el.offsetWidth
-      const data = {
-        w: w,
-        h: that.el.offsetHeight,
-        ow: w,
-        oh: that.el.offsetHeight,
-        or: window.orientation
-      }
-      if (that.type === 1 || Math.abs(window.orientation) === 90) {
-        data.ow = data.h
-        data.oh = data.w
-      }
-      that.onUpdate && that.onUpdate(data)
+      if (willChange) clearTimeout(willChange)
+      willChange = setTimeout(() => {
+        w = that.el.offsetWidth
+        // that.el.innerText += '\n' + w
+        const data = {
+          w: w,
+          h: that.el.offsetHeight,
+          ow: w,
+          oh: that.el.offsetHeight,
+          or: window.orientation
+        }
+        if (that.type === 1 || Math.abs(window.orientation) === 90) {
+          data.ow = data.h
+          data.oh = data.w
+        }
+        needUpdate = false
+        that.onUpdate && that.onUpdate(data)
+      }, 25)
     }
   }
-  window.requestAnimationFrame(update)
+
+  update()
 }
 
 Full.prototype.bindTouchmove = function () {
@@ -181,9 +200,22 @@ Full.prototype.bindTouchmove = function () {
   }, { passive: false })
 }
 
+Full.prototype.cancelFrameFn = function () {
+  var that = this
+  if (that.cancelFrame) {
+    if (window.cancelAnimationFrame) {
+      window.cancelAnimationFrame(that.cancelFrame)
+    } else {
+      clearTimeout(that.cancelFrame)
+    }
+  }
+}
+
+
 Full.prototype.destory = function () {
   this.isDestory = true
   this.unbindToggle()
+  this.cancelFrameFn()
   if (this.unBindTouchmove) {
     this.unBindTouchmove()
   }
