@@ -18,6 +18,8 @@ function Full(config) {
     h: this.el.offsetHeight,
   }
 
+  this.type = -1
+
   var style = document.createElement("style");
   style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
   var head = document.getElementsByTagName("head")[0];
@@ -91,6 +93,7 @@ Full.prototype.bindToggle = function () {
 Full.prototype.getStyle = function (boo) {
   var that = this
   var offset = that.getWH()
+  this.type = boo
   switch (boo) {
     case 1:
       var trans = Math.abs(offset.w - offset.h) / 2
@@ -146,11 +149,18 @@ Full.prototype.bindOriginChange = function () {
 
     if (that.el.offsetWidth !== w) {
       w = that.el.offsetWidth
-      that.onUpdate && that.onUpdate({
+      const data = {
         w: w,
         h: that.el.offsetHeight,
+        ow: w,
+        oh: that.el.offsetHeight,
         or: window.orientation
-      })
+      }
+      if (that.type === 1 || Math.abs(window.orientation) === 90) {
+        data.ow = data.h
+        data.oh = data.w
+      }
+      that.onUpdate && that.onUpdate(data)
     }
   }
   window.requestAnimationFrame(update)
