@@ -11,7 +11,7 @@
 ```
 
 ```js
-import Full from 'vs-full'
+import Full from 'vs-full';
 
 const full = new Full({
   // 需要全屏的容器
@@ -44,3 +44,9 @@ const full = new Full({
 | 事件名   | 描述           |
 | -------- | -------------- |
 | onUpdate | 宽高变化时触发 |
+
+## 方法
+
+| 方法名  | 描述 |
+| ------- | ---- |
+| destory | 销毁 |
