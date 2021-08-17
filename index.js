@@ -23,7 +23,7 @@ function Full(config) {
   this.cancelFrame = null
 
   var style = document.createElement("style");
-  style.appendChild(document.createTextNode(".__is_lock__{touch-action: none; overflow: hidden;}"));
+  style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
   var head = document.getElementsByTagName("head")[0];
   head.appendChild(style);
 
