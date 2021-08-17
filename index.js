@@ -10,7 +10,7 @@ function Full(config) {
   this.forceRotate = config.forceRotate || false
   this.disableScroll = config.disableScroll || false
   this.blank = this.insertBlank()
-  this.bindToggle()
+  this.unbindToggle = this.bindToggle()
   this._style = this.el.getAttribute('style')
 
   this.css = {
@@ -19,6 +19,7 @@ function Full(config) {
   }
 
   this.type = -1
+  this.isDestory = false
 
   var style = document.createElement("style");
   style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
@@ -31,7 +32,7 @@ function Full(config) {
   }
 
   if (this.disableScroll) {
-    this.touchmove()
+    this.unBindTouchmove = this.bindTouchmove()
   }
 
   this.onUpdate = function () { }
@@ -75,7 +76,7 @@ Full.prototype.getWH = function () {
 
 Full.prototype.bindToggle = function () {
   var that = this
-  this.toggle.addEventListener('click', function () {
+  const fn = function () {
     var body = document.body
     if (!body.classList.contains('__is_full__')) {
       body.classList.add('__is_full__')
@@ -87,7 +88,12 @@ Full.prototype.bindToggle = function () {
       that.getStyle(2)
       that.__is_full__ = false
     }
-  })
+  }
+  this.toggle.addEventListener('click', fn, false)
+
+  return function () {
+    that.toggle.removeEventListener('click', fn, false)
+  }
 }
 
 Full.prototype.getStyle = function (boo) {
@@ -143,7 +149,7 @@ Full.prototype.bindOriginChange = function () {
     } else {
       that.getStyle(2)
     }
-    if (that.__is_full__ || that.autoRotate) {
+    if ((that.__is_full__ || that.autoRotate) && !that.isDestory) {
       window.requestAnimationFrame(update)
     }
 
@@ -166,13 +172,21 @@ Full.prototype.bindOriginChange = function () {
   window.requestAnimationFrame(update)
 }
 
-Full.prototype.touchmove = function () {
+Full.prototype.bindTouchmove = function () {
   var body = document.body
   this.el.addEventListener('touchmove', function (event) {
     if (body.classList.contains('__is_full__')) {
       event.preventDefault();
     }
   }, { passive: false })
+}
+
+Full.prototype.destory = function () {
+  this.isDestory = true
+  this.unbindToggle()
+  if (this.unBindTouchmove) {
+    this.unBindTouchmove()
+  }
 }
 
 export default Full

@@ -17,6 +17,7 @@
     </div>
     <button id="toggle">{}</button>
   </div>
+  <button id="destory">destory</button>
   <div class="start">start</div>
   <script type="module">
     import Full from './index.js'
@@ -35,6 +36,10 @@
 
     full.onUpdate = (data) => {
       console.log(data);
+    }
+
+    document.getElementById('destory').onclick = function () {
+      full.destory()
     }
   </script>
 </body>
