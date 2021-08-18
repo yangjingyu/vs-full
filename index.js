@@ -100,6 +100,10 @@ Full.prototype.bindToggle = function () {
 Full.prototype.getStyle = function (boo) {
   var that = this
   var offset = that.getWH()
+  if (this.oldEl && this.oldEl.w === offset.w) {
+    return
+  }
+  this.oldEl = Object.assign({}, offset)
   this.type = boo
   switch (boo) {
     case 1:
