@@ -21,6 +21,7 @@ function Full(config) {
   this.type = -1
   this.isDestory = false
   this.cancelFrame = null
+  this.shoudUpdate = true
 
   var style = document.createElement("style");
   style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
@@ -78,6 +79,7 @@ Full.prototype.getWH = function () {
 Full.prototype.bindToggle = function () {
   var that = this
   const fn = function () {
+    that.shoudUpdate = true
     var body = document.body
     if (!body.classList.contains('__is_full__')) {
       body.classList.add('__is_full__')
@@ -168,6 +170,7 @@ Full.prototype.bindOriginChange = function () {
     }
 
     if (that.el.offsetWidth !== w) {
+      w = that.el.offsetWidth
       if (willChange) clearTimeout(willChange)
       willChange = setTimeout(() => {
         w = that.el.offsetWidth
