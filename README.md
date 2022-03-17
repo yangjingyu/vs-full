@@ -49,4 +49,4 @@ const full = new Full({
 
 | 方法名  | 描述 |
 | ------- | ---- |
-| destory | 销毁 |
+| destroy | 销毁 |

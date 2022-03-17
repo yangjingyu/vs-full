@@ -12,12 +12,12 @@
 <body>
   <div id="full" style="width: 100%;">
     <div class="scroll">
-      <div class="start">start</div>
+      <div class="start" id="demo">start</div>
       <div>end</div>
     </div>
     <button id="toggle">{}</button>
   </div>
-  <button id="destory">destory</button>
+  <button id="destroy">destroy</button>
   <div class="start">start</div>
   <script type="module">
     import Full from './index.js'
@@ -29,7 +29,7 @@
       // 强制旋转
       forceRotate: true,
       // 自动旋转
-      autoRotate: false,
+      autoRotate: true,
       // 禁止滑动
       disableScroll: false
     })
@@ -39,8 +39,8 @@
     }
 
 
-    document.getElementById('destory').onclick = function () {
-      full.destory()
+    document.getElementById('destroy').onclick = function () {
+      full.destroy()
     }
 
   </script>
