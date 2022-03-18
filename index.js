@@ -155,7 +155,7 @@ Full.prototype.bindOriginChange = function () {
   var update = function () {
     if (preWidth === window.innerWidth) {
       if (isFlag) {
-        that.cancelFrame = window.requestAnimationFrame(update)
+        that.cancelFrame = that.loop(update)
         return
       } else {
         if (!preTimer) {
@@ -186,11 +186,7 @@ Full.prototype.bindOriginChange = function () {
     }
 
     if ((that.__is_full__ || that.autoRotate || needUpdate) && !that.isDestroy) {
-      if (window.requestAnimationFrame) {
-        that.cancelFrame = window.requestAnimationFrame(update)
-      } else {
-        that.cancelFrame = setTimeout(update, 100)
-      }
+      that.cancelFrame = that.loop(update)
     }
 
     if (that.el.offsetWidth !== w) {
@@ -219,6 +215,16 @@ Full.prototype.bindOriginChange = function () {
   update()
 }
 
+Full.prototype.loop = function (callback) {
+  if (window.requestIdleCallback) {
+    return window.requestIdleCallback(callback)
+  }
+  if (window.requestAnimationFrame) {
+    return window.requestAnimationFrame(callback)
+  }
+  return setTimeout(callback, 100)
+}
+
 Full.prototype.bindTouchmove = function () {
   var body = document.body
   this.el.addEventListener('touchmove', function (event) {
@@ -231,11 +237,8 @@ Full.prototype.bindTouchmove = function () {
 Full.prototype.cancelFrameFn = function () {
   var that = this
   if (that.cancelFrame) {
-    if (window.cancelAnimationFrame) {
-      window.cancelAnimationFrame(that.cancelFrame)
-    } else {
-      clearTimeout(that.cancelFrame)
-    }
+    const cancel = window.cancelIdleCallback || window.cancelAnimationFrame || window.clearTimeout
+    cancel(that.cancelFrame)
   }
 }
 
