@@ -23,8 +23,6 @@ function Full(config) {
   this.cancelFrame = null
   this.shouldUpdate = true
 
-  this.preSize = undefined
-
   var style = document.createElement("style");
   style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
   var head = document.getElementsByTagName("head")[0];
@@ -57,8 +55,7 @@ Full.prototype.insertBlank = function () {
     'width: 100vw',
     'height: 100vh',
     'top: -10000px',
-    'left: -10000px',
-    'visibility: hidden'
+    'left: -10000px'
   ].join(';')
   blank.style = styles
   document.body.appendChild(blank)
@@ -147,30 +144,9 @@ Full.prototype.bindOriginChange = function () {
   var body = document.body
   var w = this.css.w
   that.cancelFrameFn()
-  var willChange = undefined
+  var willChange = null
   var needUpdate = true
-  var preTimer = undefined
-  var isFlag = false
-  var preWidth = 0
   var update = function () {
-    if (preWidth === window.innerWidth) {
-      if (isFlag) {
-        that.cancelFrame = that.loop(update)
-        return
-      } else {
-        if (!preTimer) {
-          preTimer = setTimeout(() => {
-            isFlag = true
-            preTimer = null
-          }, 3000)
-        }
-      }
-    } else {
-      preTimer && clearTimeout(preTimer)
-      preTimer = null
-    }
-    isFlag = false
-    preWidth = window.innerWidth
     if (body.classList.contains('__is_full__') || that.autoRotate) {
       if (Math.abs(window.orientation) === 90) {
         that.getStyle(3)
@@ -215,16 +191,6 @@ Full.prototype.bindOriginChange = function () {
   update()
 }
 
-Full.prototype.loop = function (callback) {
-  if (window.requestIdleCallback) {
-    return window.requestIdleCallback(callback)
-  }
-  if (window.requestAnimationFrame) {
-    return window.requestAnimationFrame(callback)
-  }
-  return setTimeout(callback, 100)
-}
-
 Full.prototype.bindTouchmove = function () {
   var body = document.body
   this.el.addEventListener('touchmove', function (event) {
@@ -241,6 +207,17 @@ Full.prototype.cancelFrameFn = function () {
     cancel(that.cancelFrame)
   }
 }
+
+Full.prototype.loop = function (callback) {
+  if (window.requestIdleCallback) {
+    return window.requestIdleCallback(callback)
+  }
+  if (window.requestAnimationFrame) {
+    return window.requestAnimationFrame(callback)
+  }
+  return setTimeout(callback, 100)
+}
+
 
 
 Full.prototype.destroy = function () {
