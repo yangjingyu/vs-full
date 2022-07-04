@@ -162,7 +162,11 @@ Full.prototype.bindOriginChange = function () {
     }
 
     if ((that.__is_full__ || that.autoRotate || needUpdate) && !that.isDestroy) {
-      that.cancelFrame = that.loop(update)
+      if (window.requestAnimationFrame) {
+        that.cancelFrame = window.requestAnimationFrame(update)
+      } else {
+        that.cancelFrame = setTimeout(update, 100)
+      }
     }
 
     if (that.el.offsetWidth !== w) {
@@ -203,21 +207,13 @@ Full.prototype.bindTouchmove = function () {
 Full.prototype.cancelFrameFn = function () {
   var that = this
   if (that.cancelFrame) {
-    const cancel = window.cancelIdleCallback || window.cancelAnimationFrame || window.clearTimeout
-    cancel(that.cancelFrame)
+    if (window.cancelAnimationFrame) {
+      window.cancelAnimationFrame(that.cancelFrame)
+    } else {
+      clearTimeout(that.cancelFrame)
+    }
   }
 }
-
-Full.prototype.loop = function (callback) {
-  if (window.requestIdleCallback) {
-    return window.requestIdleCallback(callback)
-  }
-  if (window.requestAnimationFrame) {
-    return window.requestAnimationFrame(callback)
-  }
-  return setTimeout(callback, 100)
-}
-
 
 
 Full.prototype.destroy = function () {
