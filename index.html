@@ -10,8 +10,8 @@
 </head>
 
 <body>
-  <div id="full" style="width: 100%;">
-    <video src="./190204084208765161.mp4" style="width: 100%;height: 100%;" autoplay controls></video>
+  <div id="full">
+    <video src="./190204084208765161.mp4" style="width: 100%;height: 100%;" autoplay></video>
     <!-- <div class="scroll">
       <div class="start" id="demo">start</div>
       <div>end</div>
@@ -19,6 +19,7 @@
     <button id="toggle">{}</button>
   </div>
   <button id="destroy">destroy</button>
+  <button id="toggleBtn">toggle</button>
   <div class="start">start</div>
   <script type="module">
     import Full from './index.js'
@@ -28,7 +29,7 @@
       // 切换按钮
       toggle: document.querySelector('#toggle'),
       // 强制旋转
-      forceRotate: true,
+      forceRotate: false,
       // 自动旋转
       autoRotate: true,
       // 禁止滑动
@@ -43,6 +44,11 @@
     document.getElementById('destroy').onclick = function () {
       full.destroy()
     }
+    document.getElementById('toggleBtn').onclick = function () {
+      full.toggle()
+    }
+
+    window.full = full
 
   </script>
 </body>
