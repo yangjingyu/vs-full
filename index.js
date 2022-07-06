@@ -162,15 +162,30 @@ class Full {
     }
     mql.addEventListener('change', screenChange)
 
+    let fullChange = () => {
+      if (!document.fullscreenElement) {
+        body.classList.remove('__is_full__')
+        this.is_full = false
+      } else {
+        this.isNative = true
+        body.classList.add('__is_full__')
+        this.is_full = true
+      }
+    }
+
+    this.$el.addEventListener('fullscreenchange', fullChange)
+
     this.__destroy__ = () => {
       mql.removeEventListener('change', screenChange)
       this.$toggle && this.$toggle.removeEventListener('click', toggle)
+      this.$el.removeEventListener('fullscreenchange', fullChange)
       this.toggle = null
       this.$toggle = null
       this.$el = null
       this.__destroy__ = null
       toggle = null
       screenChange = null
+      fullChange = null
     }
   }
 
