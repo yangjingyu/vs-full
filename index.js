@@ -4,11 +4,7 @@ const isMobile = () => {
 }
 
 const getEl = (el) => {
-  if (typeof el === 'string') {
-    return document.querySelector(el)
-  } else {
-    return el
-  }
+  return typeof el === 'string' ? document.querySelector(el) : el
 }
 
 const globalStyle = `
@@ -27,6 +23,7 @@ const createStyle = () => {
   style.appendChild(document.createTextNode(globalStyle));
   const head = document.getElementsByTagName("head")[0];
   head.appendChild(style);
+  return style
 }
 
 const bindTouchmove = (el) => {
@@ -106,13 +103,14 @@ class Full {
     this.cssText = this.$el.style.cssText
     this.config = config
     this.is_full = false
-    createStyle()
+    this.__style__ = createStyle()
+    this.isNative = config.nativeFirst && document.fullscreenEnabled
 
     if (this.disableScroll) {
       this.__un_bind_touchmove__ = bindTouchmove(this.$el)
     }
 
-    if (config.autoRotate && isMobile() && window.innerHeight < window.innerWidth) {
+    if (this.__need3__()) {
       this.__setCss__(3)
     }
 
@@ -167,7 +165,6 @@ class Full {
         body.classList.remove('__is_full__')
         this.is_full = false
       } else {
-        this.isNative = true
         body.classList.add('__is_full__')
         this.is_full = true
       }
@@ -183,6 +180,8 @@ class Full {
       this.$toggle = null
       this.$el = null
       this.__destroy__ = null
+      this.__style__.parentNode.removeChild(this.__style__)
+      this.__style__ = null
       toggle = null
       screenChange = null
       fullChange = null
@@ -190,13 +189,14 @@ class Full {
   }
 
   requestFullscreen() {
-    if (this.config.nativeFirst) {
-      const isFull = requestFullscreen(this.$el)
-      this.isNative = isFull
-    }
     body.classList.add('__is_full__')
     this.is_full = true
-    if (!this.isNative) {
+    if (this.isNative) {
+      requestFullscreen(this.$el)
+      if (this.config.forceRotate && isMobile() && screen.orientation) {
+        screen.orientation.lock("landscape-primary");
+      }
+    } else {
       if (this.__full__) return
       this.$el.style.cssText = this.config.forceRotate && window.innerHeight > window.innerWidth ? fullStyleRotate(body) : fullStyle
       this.onUpdate && this.onUpdate()
@@ -208,13 +208,20 @@ class Full {
     this.is_full = false
     if (this.isNative) {
       exitFullScreen()
+      if (this.__need3__()) {
+        this.__setCss__(3)
+      }
     } else {
-      if (this.config.autoRotate && isMobile() && window.innerHeight < window.innerWidth) {
+      if (this.__need3__()) {
         this.__setCss__(3)
       } else {
         this.__setCss__(1)
       }
     }
+  }
+
+  __need3__() {
+    return this.config.autoRotate && isMobile() && window.innerHeight < window.innerWidth
   }
 
   __setCss__(type) {
