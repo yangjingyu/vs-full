@@ -38,6 +38,7 @@ const full = new Full({
 | forceRotate   | 强制旋转 | `boolean`                   | false  |
 | autoRotate    | 自动旋转 | `boolean`                   | false  |
 | disableScroll | 禁止滑动 | `boolean`                   | false  |
+| nativeFirst   | 原生优先 | `boolean`                   | false  |
 
 ## 事件
 
@@ -47,7 +48,13 @@ const full = new Full({
 
 ## 方法
 
-| 方法名  | 描述 |
-| ------- | ---- |
-| toggle | 切换全屏 |
-| destroy | 销毁 |
+| 方法名            | 描述     |
+| ----------------- | -------- |
+| toggle            | 切换全屏 |
+| requestFullscreen | 进入全屏 |
+| exitFullScreen    | 退出全屏 |
+| destroy           | 销毁     |
+
+## 注意
+
+1. 如果 body 元素为 position:absolute;，请设置根元素的宽高

@@ -13,6 +13,7 @@ const getEl = (el) => {
 
 const globalStyle = `
 .__is_full__ {
+  position: absolute;
   touch-action: none;
   overflow: hidden;
   width: 100%!important;
@@ -29,7 +30,7 @@ const createStyle = () => {
 }
 
 const bindTouchmove = (el) => {
-  const body = document.body
+  const body = body
   function ev(event) {
     if (body.classList.contains('__is_full__')) {
       event.preventDefault();
@@ -60,6 +61,36 @@ const fullStyleRotate = (el) => `
   margin-left: ${el.offsetWidth}px;
 `
 
+const requestFullscreen = (docElm) => {
+  if (docElm.requestFullscreen) {
+    docElm.requestFullscreen()
+    return true
+  } else if (docElm.msRequestFullscreen) {
+    docElm.msRequestFullscreen()
+    return true
+  } else if (docElm.mozRequestFullScreen) {
+    docElm.mozRequestFullScreen()
+    return true
+  } else if (docElm.webkitRequestFullScreen) {
+    docElm.webkitRequestFullScreen()
+    return true
+  }
+  return false
+}
+
+const exitFullScreen = () => {
+  if (document.exitFullscreen) {
+    document.exitFullscreen()
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen()
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen()
+  } else if (document.webkitCancelFullScreen) {
+    document.webkitCancelFullScreen()
+  }
+}
+
+const body = document.body
 class Full {
   constructor(config) {
     this.$el = getEl(config.el)
@@ -73,34 +104,23 @@ class Full {
       }
     }
     this.cssText = this.$el.style.cssText
+    this.config = config
     this.is_full = false
-    const body = document.body
     createStyle()
 
     if (this.disableScroll) {
       this.__un_bind_touchmove__ = bindTouchmove(this.$el)
     }
 
-    if (config.autoRotate && isMobile() && body.offsetHeight < body.offsetWidth) {
-      this.__full__ = true
-      this.$el.style.cssText = fullStyle
+    if (config.autoRotate && isMobile() && window.innerHeight < window.innerWidth) {
+      this.__setCss__(3)
     }
 
     let toggle = () => {
       if (!body.classList.contains('__is_full__')) {
-        body.classList.add('__is_full__')
-        this.is_full = true
-        if (this.__full__) return
-        this.$el.style.cssText = config.forceRotate && body.offsetHeight > body.offsetWidth ? fullStyleRotate(body) : fullStyle
-        this.onUpdate && this.onUpdate()
+        this.requestFullscreen()
       } else {
-        body.classList.remove('__is_full__')
-        this.is_full = false
-        if (config.autoRotate && isMobile() && body.offsetHeight < body.offsetWidth) {
-          this.__setCss__(3)
-        } else {
-          this.__setCss__(1)
-        }
+        this.exitFullScreen()
       }
     }
 
@@ -114,7 +134,9 @@ class Full {
     let screenChange = (e) => {
       if (e.matches) {
         if (this.is_full) {
-          if (config.forceRotate) {
+          if (this.isNative) {
+            this.__setCss__(1)
+          } else {
             this.__setCss__(3)
           }
         } else {
@@ -125,7 +147,11 @@ class Full {
       } else {
         if (this.is_full) {
           if (config.forceRotate) {
-            this.__setCss__(2)
+            if (this.isNative) {
+              this.__setCss__(1)
+            } else {
+              this.__setCss__(2)
+            }
           }
         } else {
           if (config.autoRotate && isMobile()) {
@@ -148,6 +174,34 @@ class Full {
     }
   }
 
+  requestFullscreen() {
+    if (this.config.nativeFirst) {
+      const isFull = requestFullscreen(this.$el)
+      this.isNative = isFull
+    }
+    body.classList.add('__is_full__')
+    this.is_full = true
+    if (!this.isNative) {
+      if (this.__full__) return
+      this.$el.style.cssText = this.config.forceRotate && window.innerHeight > window.innerWidth ? fullStyleRotate(body) : fullStyle
+      this.onUpdate && this.onUpdate()
+    }
+  }
+
+  exitFullScreen() {
+    body.classList.remove('__is_full__')
+    this.is_full = false
+    if (this.isNative) {
+      exitFullScreen()
+    } else {
+      if (this.config.autoRotate && isMobile() && window.innerHeight < window.innerWidth) {
+        this.__setCss__(3)
+      } else {
+        this.__setCss__(1)
+      }
+    }
+  }
+
   __setCss__(type) {
     switch (type) {
       case 1:
@@ -155,7 +209,7 @@ class Full {
         this.__full__ = false
         break
       case 2:
-        this.$el.style.cssText = fullStyleRotate(document.body)
+        this.$el.style.cssText = fullStyleRotate(body)
         this.__full__ = false
         break
       case 3:

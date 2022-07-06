@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./css/demo.css">
 </head>
 
-<body style="position:absolute;">
+<body>
   <div id="full">
     <video src="./190204084208765161.mp4" style="width: 100%;height: 100%;" autoplay></video>
     <div class="scroll">
@@ -29,11 +29,13 @@
       // 切换按钮
       toggle: document.querySelector('#toggle'),
       // 强制旋转
-      forceRotate: false,
+      forceRotate: true,
       // 自动旋转
-      autoRotate: false,
+      autoRotate: true,
       // 禁止滑动
-      disableScroll: false
+      disableScroll: false,
+      // 原生全屏方法优先
+      nativeFirst: true
     })
 
     full.onUpdate = (data) => {
