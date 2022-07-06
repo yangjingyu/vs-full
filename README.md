@@ -49,4 +49,5 @@ const full = new Full({
 
 | 方法名  | 描述 |
 | ------- | ---- |
+| toggle | 切换全屏 |
 | destroy | 销毁 |

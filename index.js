@@ -3,7 +3,6 @@ const isMobile = () => {
   return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
 }
 
-
 const getEl = (el) => {
   if (typeof el === 'string') {
     return document.querySelector(el)
@@ -12,25 +11,21 @@ const getEl = (el) => {
   }
 }
 
+const globalStyle = `
+.__is_full__ {
+  touch-action: none;
+  overflow: hidden;
+  width: 100%!important;
+  height: 100%!important;
+  margin: 0;
+}
+`
+
 const createStyle = () => {
   const style = document.createElement("style");
-  style.appendChild(document.createTextNode(".__is_full__{touch-action: none; overflow: hidden;}"));
+  style.appendChild(document.createTextNode(globalStyle));
   const head = document.getElementsByTagName("head")[0];
   head.appendChild(style);
-}
-
-const createBlank = () => {
-  const blank = document.createElement('div')
-  const styles = [
-    'position: absolute',
-    'width: 100%',
-    'height: 100%',
-    'top: -10000px',
-    'left: -10000px'
-  ].join(';')
-  blank.style = styles
-  document.body.appendChild(blank)
-  return blank
 }
 
 const bindTouchmove = (el) => {
@@ -69,7 +64,6 @@ class Full {
   constructor(config) {
     this.$el = getEl(config.el)
     this.$toggle = getEl(config.toggle)
-    this.$blank = createBlank()
     this.cssText = this.$toggle.style.cssText
     this.is_full = false
     const body = document.body
@@ -79,22 +73,22 @@ class Full {
       this.__un_bind_touchmove__ = bindTouchmove(this.$el)
     }
 
-    if (config.autoRotate && isMobile() && this.$blank.offsetHeight < this.$blank.offsetWidth) {
+    if (config.autoRotate && isMobile() && body.offsetHeight < body.offsetWidth) {
       this.__full__ = true
       this.$el.style.cssText = fullStyle
     }
 
-    const toggle = () => {
+    let toggle = () => {
       if (!body.classList.contains('__is_full__')) {
         body.classList.add('__is_full__')
         this.is_full = true
         if (this.__full__) return
-        this.$el.style.cssText = config.forceRotate ? fullStyleRotate(this.$blank) : fullStyle
+        this.$el.style.cssText = config.forceRotate && body.offsetHeight > body.offsetWidth ? fullStyleRotate(body) : fullStyle
         this.onUpdate && this.onUpdate()
       } else {
         body.classList.remove('__is_full__')
         this.is_full = false
-        if (config.autoRotate && isMobile() && this.$blank.offsetHeight < this.$blank.offsetWidth) {
+        if (config.autoRotate && isMobile() && body.offsetHeight < body.offsetWidth) {
           this.__setCss__(3)
         } else {
           this.__setCss__(1)
@@ -106,7 +100,7 @@ class Full {
     this.$toggle.addEventListener('click', toggle, false)
 
     var mql = window.matchMedia('(orientation: landscape)');
-    const screenChange = (e) => {
+    let screenChange = (e) => {
       if (e.matches) {
         if (this.is_full) {
           if (config.forceRotate) {
@@ -134,12 +128,12 @@ class Full {
     this.__destroy__ = () => {
       mql.removeEventListener('change', screenChange)
       this.$toggle.removeEventListener('click', toggle)
-      toggle = null
-      this.__destroy__ = null
-      screenChange = null
+      this.toggle = null
       this.$toggle = null
-      this.$blank = null
       this.$el = null
+      this.__destroy__ = null
+      toggle = null
+      screenChange = null
     }
   }
 
@@ -150,7 +144,7 @@ class Full {
         this.__full__ = false
         break
       case 2:
-        this.$el.style.cssText = fullStyleRotate(this.$blank)
+        this.$el.style.cssText = fullStyleRotate(document.body)
         this.__full__ = false
         break
       case 3:
@@ -165,11 +159,9 @@ class Full {
 
   destroy() {
     this.$el.style.cssText = this.cssText
-    this.$blank.parentNode.removeChild(this.$blank)
     this.__destroy__()
     this.__un_bind_touchmove__ && this.__un_bind_touchmove__()
   }
 }
-
 
 export default Full
