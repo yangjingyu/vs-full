@@ -57,4 +57,4 @@ const full = new Full({
 
 ## 注意
 
-1. 如果 body 元素为 position:absolute;，请设置根元素的宽高
+1. 如果 body 元素为 position:absolute; 请设置根元素的宽高
