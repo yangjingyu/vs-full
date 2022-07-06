@@ -63,8 +63,16 @@ const fullStyleRotate = (el) => `
 class Full {
   constructor(config) {
     this.$el = getEl(config.el)
-    this.$toggle = getEl(config.toggle)
-    this.cssText = this.$toggle.style.cssText
+    if (!(this.$el instanceof HTMLElement)) {
+      throw 'el must be Element or Selector!'
+    }
+    if (config.toggle) {
+      this.$toggle = getEl(config.toggle)
+      if (!(this.$toggle instanceof HTMLElement)) {
+        throw 'toggle must be Element or Selector!'
+      }
+    }
+    this.cssText = this.$el.style.cssText
     this.is_full = false
     const body = document.body
     createStyle()
@@ -97,7 +105,10 @@ class Full {
     }
 
     this.toggle = toggle.bind(this)
-    this.$toggle.addEventListener('click', toggle, false)
+
+    if (this.$toggle instanceof HTMLElement) {
+      this.$toggle.addEventListener('click', toggle, false)
+    }
 
     var mql = window.matchMedia('(orientation: landscape)');
     let screenChange = (e) => {
@@ -127,7 +138,7 @@ class Full {
 
     this.__destroy__ = () => {
       mql.removeEventListener('change', screenChange)
-      this.$toggle.removeEventListener('click', toggle)
+      this.$toggle && this.$toggle.removeEventListener('click', toggle)
       this.toggle = null
       this.$toggle = null
       this.$el = null
