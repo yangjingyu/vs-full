@@ -58,6 +58,24 @@ const fullStyleRotate = (el) => `
   margin-left: ${el.offsetWidth}px;
 `
 
+const getOrientation = () => {
+  return typeof window.orientation ? window.orientation : screen.orientation ? screen.orientation.angle : 0
+}
+
+const fullStyleRotate90 = () => {
+  const angle = getOrientation()
+  return `
+    position: fixed;
+    left: 0px;
+    height: ${window.innerWidth}px;
+    width: ${window.innerHeight}px;
+    top: 0px;
+    transform: rotate(${angle == 90 ? -90 : 90}deg);
+    transform-origin: ${angle == 90 ? 'right' : 0} 0;
+    margin-left: ${angle == 90 ? -window.innerHeight : window.innerWidth}px;
+  `
+}
+
 const requestFullscreen = (docElm) => {
   if (docElm.requestFullscreen) {
     docElm.requestFullscreen()
@@ -131,6 +149,14 @@ class Full {
     var mql = window.matchMedia('(orientation: landscape)');
     let screenChange = (e) => {
       if (e.matches) {
+        if (this.isLock) {
+          if (this.lockOr === 'landscape') {
+            this.__setCss__(3)
+          } else {
+            this.__setCss__(4)
+          }
+          return
+        }
         if (this.is_full) {
           if (this.isNative) {
             this.__setCss__(1)
@@ -143,6 +169,14 @@ class Full {
           }
         }
       } else {
+        if (this.isLock) {
+          if (this.lockOr === 'landscape') {
+            this.__setCss__(4)
+          } else {
+            this.__setCss__(3)
+          }
+          return
+        }
         if (this.is_full) {
           if (config.forceRotate) {
             if (this.isNative) {
@@ -188,6 +222,55 @@ class Full {
     }
   }
 
+  canLock() {
+    return isMobile()
+  }
+
+  lock(primary) {
+    if (!isMobile()) return
+    // portrait 竖屏
+    // landscape 横屏
+    if (this.isLock) return
+    if (!primary) {
+      primary = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'
+    }
+    this.isLock = true
+    this.lockOr = primary
+    // 原生全屏|锁屏
+    if (this.config.nativeFirst && screen.orientation && document.fullscreenEnabled) {
+      if (!document.fullscreenElement) {
+        this.__lock_need_exit = true
+        this.requestFullscreen()
+      }
+      screen.orientation.lock(`${primary}-primary`)
+    } else {
+      if (primary === 'portrait') {
+        this.__setCss__(3)
+      }
+    }
+  }
+
+  unlock() {
+    if (!isMobile()) return
+    if (!this.isLock) return
+    this.isLock = false
+    if (this.config.nativeFirst && screen.orientation && document.fullscreenElement) {
+      if (this.__lock_need_exit) {
+        this.exitFullScreen()
+        this.__lock_need_exit = false
+      }
+      screen.orientation.unlock()
+    } else {
+      this.is_full = false
+      body.classList.remove('__is_full__')
+      if (this.__need3__()) {
+        this.__setCss__(3)
+      } else {
+        this.__setCss__(1)
+      }
+    }
+  }
+
   requestFullscreen() {
     body.classList.add('__is_full__')
     this.is_full = true
@@ -206,6 +289,7 @@ class Full {
   exitFullScreen() {
     body.classList.remove('__is_full__')
     this.is_full = false
+    this.isLock = false
     if (this.isNative) {
       exitFullScreen()
       if (this.__need3__()) {
@@ -237,6 +321,9 @@ class Full {
       case 3:
         this.__full__ = true
         this.$el.style.cssText = fullStyle
+        break
+      case 4:
+        this.$el.style.cssText = fullStyleRotate90()
         break
     }
     this.onUpdate && this.onUpdate()
